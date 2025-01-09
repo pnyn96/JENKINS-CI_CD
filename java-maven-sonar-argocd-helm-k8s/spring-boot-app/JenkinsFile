@@ -82,7 +82,7 @@ pipeline {
     }
     stage('Sync with ArgoCD') {
       steps {
-        withCredentials([string(credentialsId: 'argocd-token', variable: 'ARGOCD_AUTH_TOKEN')]) {
+        withCredentials([string(credentialsId: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmdvY2QiLCJzdWIiOiJhZG1pbjphcGlLZXkiLCJuYmYiOjE3MzY0MTc1OTEsImlhdCI6MTczNjQxNzU5MSwianRpIjoiZWZkZjNlODQtY2E3ZC00ZjFlLThlMmEtZGZhM2ZlZDM5NDgyIn0.FA4UFY2_ikzHYnOEJ0kaTAYiey6yZrza-k6JFZyYYNs', variable: 'ARGOCD_AUTH_TOKEN')]) {
           sh '''
             # Sync application using ArgoCD CLI
             argocd --server http://3.143.222.120:32539 --auth-token $ARGOCD_AUTH_TOKEN app sync test --wait
