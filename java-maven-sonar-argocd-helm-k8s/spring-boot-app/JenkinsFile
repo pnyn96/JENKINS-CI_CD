@@ -80,5 +80,16 @@ pipeline {
         }
       }
     }
+    stage('Sync with ArgoCD') {
+      steps {
+        withCredentials([string(credentialsId: 'argocd-token', variable: 'ARGOCD_AUTH_TOKEN')]) {
+          sh '''
+            # Sync application using ArgoCD CLI
+            argocd --server http://3.143.222.120:32539 --auth-token $ARGOCD_AUTH_TOKEN app sync test --wait
+          '''
+        }
+      }
+    }
   }
 }
+
