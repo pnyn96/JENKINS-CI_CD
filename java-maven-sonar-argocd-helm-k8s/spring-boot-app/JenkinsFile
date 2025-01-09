@@ -8,8 +8,16 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        sh 'echo passed'
-        //git branch: 'main', url: 'https://github.com/pnyn96/JENKINS-CI_CD.git'
+        script {
+          // Specify branch and repository directly
+          sh '''
+            if [ -d JENKINS-CI_CD ]; then
+              rm -rf JENKINS-CI_CD
+            fi
+            git clone --branch main https://github.com/pnyn96/JENKINS-CI_CD.git
+            cd JENKINS-CI_CD
+          '''
+        }
       }
     }
     stage('Build and Test') {
