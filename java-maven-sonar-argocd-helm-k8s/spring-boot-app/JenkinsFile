@@ -57,21 +57,28 @@ pipeline {
       }
     }
     stage('Update Deployment File') {
-      steps {
+    steps {
         withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-          sh '''
-            cd JENKINS-CI_CD
-            echo "java-maven-sonar-argocd-helm-k8s/spring-boot-app/target/" >> .gitignore
-            git clean -fd
-            git config user.email "yashukrishna.xyz@gmail.com"
-            git config user.name "Yashasvi Lonewolf"
-            sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-            git add .gitignore java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-            git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-            git push https://${GITHUB_TOKEN}@github.com/pnyn96/JENKINS-CI_CD.git main
-          '''
+            sh '''
+                cd JENKINS-CI_CD
+                
+                # Create .gitignore if it doesn't exist
+                if [ ! -f .gitignore ]; then
+                    echo "java-maven-sonar-argocd-helm-k8s/spring-boot-app/target/" > .gitignore
+                    git add .gitignore
+                fi
+                
+                # Clean untracked files
+                git clean -fd
+                
+                # Configure Git and update deployment file
+                git config user.email "yashukrishna.xyz@gmail.com"
+                git config user.name "Yashasvi Lonewolf"
+                sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+                git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+                git commit -m "Update deployment image to version ${BUILD_NUMBER}" || echo "No changes to commit"
+                git push https://${GITHUB_TOKEN}@github.com/pnyn96/JENKINS-CI_CD.git main
+            '''
         }
-      }
     }
-  }
 }
