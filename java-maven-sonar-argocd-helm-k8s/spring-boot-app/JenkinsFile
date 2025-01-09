@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'abhishekf5/maven-abhishek-docker-agent:v1'
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+      args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
   stages {
@@ -20,17 +20,14 @@ pipeline {
         }
       }
     }
-
     stage('Build and Test') {
       steps {
         sh '''
-          ls -ltr
           cd JENKINS-CI_CD/java-maven-sonar-argocd-helm-k8s/spring-boot-app
           mvn clean package
         '''
       }
     }
-
     stage('Static Code Analysis') {
       environment {
         SONAR_URL = "http://18.224.67.72:9000"
@@ -44,7 +41,6 @@ pipeline {
         }
       }
     }
-
     stage('Build and Push Docker Image') {
       environment {
         DOCKER_IMAGE = "yashu7862/ultimate-cicd:${BUILD_NUMBER}"
@@ -60,16 +56,17 @@ pipeline {
         }
       }
     }
-
     stage('Update Deployment File') {
       steps {
         withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
           sh '''
             cd JENKINS-CI_CD
+            echo "java-maven-sonar-argocd-helm-k8s/spring-boot-app/target/" >> .gitignore
+            git clean -fd
             git config user.email "yashukrishna.xyz@gmail.com"
             git config user.name "Yashasvi Lonewolf"
             sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-            git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+            git add .gitignore java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
             git commit -m "Update deployment image to version ${BUILD_NUMBER}"
             git push https://${GITHUB_TOKEN}@github.com/pnyn96/JENKINS-CI_CD.git main
           '''
