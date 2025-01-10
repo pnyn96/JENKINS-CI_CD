@@ -107,4 +107,3 @@ stage('Sync ArgoCD Application') {
     }
   }
 }
-
