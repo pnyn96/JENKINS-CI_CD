@@ -86,7 +86,7 @@ pipeline {
         ARGOCD_APP_NAME = 'test'   // Your application name in ArgoCD
         // You can add the environment variables for username and password here
         ARGOCD_USERNAME = credentials('admin')  // Your ArgoCD username from Jenkins credentials
-        ARGOCD_PASSWORD = credentials('newton786#A')  // Your ArgoCD password from Jenkins credentials
+        ARGOCD_PASSWORD = credentials('mont786#A')  // Your ArgoCD password from Jenkins credentials
       }
       steps {
         script {
