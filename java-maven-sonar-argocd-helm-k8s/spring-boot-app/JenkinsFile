@@ -80,7 +80,7 @@ pipeline {
         }
         stage('Sync with ArgoCD') {
             environment {
-                ARGOCD_SERVER = '3.145.115.90:32539'  // Corrected ArgoCD server URL (without http://)
+                ARGOCD_SERVER = 'http://18.119.253.206:31926'  // Corrected ArgoCD server URL (without http://)
                 ARGOCD_AUTH_TOKEN = credentials('argocd-token')  // The ArgoCD authentication token
             }
             steps {
