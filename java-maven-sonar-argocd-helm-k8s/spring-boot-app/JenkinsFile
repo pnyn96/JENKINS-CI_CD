@@ -82,3 +82,28 @@ pipeline {
     }
   }
 }
+stage('Sync ArgoCD Application') {
+      environment {
+        ARGOCD_SERVER = 'http://18.119.253.206:31926'  // ArgoCD server URL
+        ARGOCD_APP_NAME = 'test'   // Your application name in ArgoCD
+        ARGOCD_AUTH_TOKEN = credentials('argocd-token') // ArgoCD Auth Token
+      }
+      steps {
+        script {
+          sh '''
+            # Install ArgoCD CLI (if not installed already)
+            curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+            chmod +x argocd-linux-amd64
+            mv argocd-linux-amd64 /usr/local/bin/argocd
+
+            # Log in to ArgoCD using the provided auth token
+            argocd login $ARGOCD_SERVER --auth-token $ARGOCD_AUTH_TOKEN --insecure
+
+            # Sync the ArgoCD application to apply the updated deployment
+            argocd app sync $ARGOCD_APP_NAME --wait
+          '''
+        }
+      }
+    }
+  }
+}
