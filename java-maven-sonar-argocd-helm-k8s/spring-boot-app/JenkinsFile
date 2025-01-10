@@ -7,22 +7,19 @@ pipeline {
     }
     environment {
         SONAR_URL = "http://18.118.95.186:9000"
-        GIT_REPO = "https://github.com/pnyn96/JENKINS-CI_CD.git"
-        GIT_BRANCH = "main"
         DOCKER_IMAGE = "yashu7862/ultimate-cicd"
         ARGOCD_SERVER = "http://18.119.253.206:31926"
-        ARGOCD_APP_NAME = "test"
+        ARGOCD_APP_NAME = "test" // Application name in ArgoCD
     }
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    // Clean up and clone the repository
                     sh '''
                     if [ -d JENKINS-CI_CD ]; then
                         rm -rf JENKINS-CI_CD
                     fi
-                    git clone --branch ${GIT_BRANCH} ${GIT_REPO}
+                    git clone --branch main https://github.com/pnyn96/JENKINS-CI_CD.git
                     '''
                 }
             }
@@ -74,7 +71,7 @@ pipeline {
                         git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
                         git add .gitignore
                         git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                        git push https://${GITHUB_TOKEN}@github.com/pnyn96/JENKINS-CI_CD HEAD:${GIT_BRANCH}
+                        git push https://${GITHUB_TOKEN}@github.com/pnyn96/JENKINS-CI_CD HEAD:main
                         '''
                     }
                 }
@@ -82,8 +79,8 @@ pipeline {
         }
         stage('Sync ArgoCD Application') {
             environment {
-                ARGOCD_USERNAME = credentials('admin') // Replace 'argocd-username' with the actual Jenkins credential ID
-                ARGOCD_PASSWORD = credentials('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmdvY2QiLCJzdWIiOiJhZG1pbjphcGlLZXkiLCJuYmYiOjE3MzY1MTAwMDIsImlhdCI6MTczNjUxMDAwMiwianRpIjoiOTZmMDMyMzEtMTAwNC00MDIyLTk3NzMtYWRkZGI5MDk5N2VjIn0.emG7V2G1Cfw8Cpr4U0SgF5aOxjOor4gOON-A__3nsg4') // Replace 'argocd-password' with the actual Jenkins credential ID
+                ARGOCD_USERNAME = credentials('argocd-username') // Replace with Jenkins credential ID for username
+                ARGOCD_PASSWORD = credentials('argocd-password') // Replace with Jenkins credential ID for password
             }
             steps {
                 script {
@@ -107,7 +104,7 @@ pipeline {
     }
     post {
         always {
-            cleanWs() // Clean up the workspace
+            cleanWs() // Clean up workspace
         }
     }
 }
