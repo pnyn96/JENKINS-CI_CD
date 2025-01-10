@@ -79,8 +79,8 @@ pipeline {
         }
         stage('Sync ArgoCD Application') {
             environment {
-                ARGOCD_USERNAME = credentials('argocd-username') // Replace with Jenkins credential ID for username
-                ARGOCD_PASSWORD = credentials('argocd-password') // Replace with Jenkins credential ID for password
+                ARGOCD_USERNAME = credentials('admin') // Replace with Jenkins credential ID for username
+                ARGOCD_PASSWORD = credentials('mont786#A') // Replace with Jenkins credential ID for password
             }
             steps {
                 script {
