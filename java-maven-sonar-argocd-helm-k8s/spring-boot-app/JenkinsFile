@@ -7,19 +7,22 @@ pipeline {
     }
     environment {
         SONAR_URL = "http://18.118.95.186:9000"
+        GIT_REPO = "https://github.com/pnyn96/JENKINS-CI_CD.git"
+        GIT_BRANCH = "main"
         DOCKER_IMAGE = "yashu7862/ultimate-cicd"
         ARGOCD_SERVER = "http://18.119.253.206:31926"
-        ARGOCD_APP_NAME = "test" // Application name in ArgoCD
+        ARGOCD_APP_NAME = "test"
     }
     stages {
         stage('Checkout') {
             steps {
                 script {
+                    // Clean up and clone the repository
                     sh '''
                     if [ -d JENKINS-CI_CD ]; then
                         rm -rf JENKINS-CI_CD
                     fi
-                    git clone --branch main https://github.com/pnyn96/JENKINS-CI_CD.git
+                    git clone --branch ${GIT_BRANCH} ${GIT_REPO}
                     '''
                 }
             }
@@ -71,7 +74,7 @@ pipeline {
                         git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
                         git add .gitignore
                         git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                        git push https://${GITHUB_TOKEN}@github.com/pnyn96/JENKINS-CI_CD HEAD:main
+                        git push https://${GITHUB_TOKEN}@github.com/pnyn96/JENKINS-CI_CD HEAD:${GIT_BRANCH}
                         '''
                     }
                 }
@@ -79,8 +82,8 @@ pipeline {
         }
         stage('Sync ArgoCD Application') {
             environment {
-                ARGOCD_USERNAME = credentials('admin') // Replace with Jenkins credential ID for username
-                ARGOCD_PASSWORD = credentials('mont786#A') // Replace with Jenkins credential ID for password
+                ARGOCD_USERNAME = credentials('admin') // Replace 'argocd-username' with the actual Jenkins credential ID
+                ARGOCD_PASSWORD = credentials('mont786#A') // Replace 'argocd-password' with the actual Jenkins credential ID
             }
             steps {
                 script {
@@ -102,3 +105,9 @@ pipeline {
             }
         }
     }
+    post {
+        always {
+            cleanWs() // Clean up the workspace
+        }
+    }
+}
