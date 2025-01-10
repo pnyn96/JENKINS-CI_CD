@@ -52,7 +52,7 @@ pipeline {
         script {
           sh '''
             cd JENKINS-CI_CD/java-maven-sonar-argocd-helm-k8s/spring-boot-app
-            docker build -t ${DOCKER_IMAGE} .
+            docker build -t ${DOCKER_IMAGE} . 
           '''
           def dockerImage = docker.image("${DOCKER_IMAGE}")
           docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
@@ -82,9 +82,11 @@ pipeline {
     }
     stage('Sync ArgoCD Application') {
       environment {
-        ARGOCD_SERVER = '18.119.253.206:31926'  // ArgoCD server URL
+        ARGOCD_SERVER = 'http://18.119.253.206:31926'  // ArgoCD server URL
         ARGOCD_APP_NAME = 'test'   // Your application name in ArgoCD
-        ARGOCD_AUTH_TOKEN = credentials('argocd-token') // ArgoCD Auth Token
+        // You can add the environment variables for username and password here
+        ARGOCD_USERNAME = credentials('admin')  // Your ArgoCD username from Jenkins credentials
+        ARGOCD_PASSWORD = credentials('newton786#A')  // Your ArgoCD password from Jenkins credentials
       }
       steps {
         script {
@@ -94,8 +96,8 @@ pipeline {
             chmod +x argocd-linux-amd64
             mv argocd-linux-amd64 /usr/local/bin/argocd
 
-            # Log in to ArgoCD using the provided auth token
-            argocd login $ARGOCD_SERVER --auth-token $ARGOCD_AUTH_TOKEN --insecure
+            # Log in to ArgoCD using the provided username and password
+            argocd login $ARGOCD_SERVER --username $ARGOCD_USERNAME --password $ARGOCD_PASSWORD --insecure
 
             # Sync the ArgoCD application to apply the updated deployment
             argocd app sync $ARGOCD_APP_NAME --wait
